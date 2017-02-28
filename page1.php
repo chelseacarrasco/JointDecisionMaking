@@ -14,21 +14,16 @@
         
         <h1>Chelsea's Document Classification Test</h1>
         <h2>Let's Start!</h2>
-        
-        <!--
-            MADE WITH <3 AND JAVASCRIPT
-        -->
-    
 <p>
     Welcome, <?php echo $_POST["firstname"];?>, age <?php echo $_POST["age"];?>. 
+    
+<?php
+$textID = 1;
+$count = 1; 
+?>
 
-<h3><center>Passage id="number" of 20</center></h3>
-<script>
-var num = 1;
-document.getElementById("number").innerHTML = num;
-</script> 
+<h3><center> <?php echo "Passage {$count} of 20"?></center></h3>
 
-<!-- <iframe src=http://www.textfiles.com/etext/NONFICTION/inaugurl></iframe> --!> 
 <?php
 $servername = "localhost";
 $username = "root";
@@ -42,25 +37,50 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "SELECT id, reutersID, text FROM textfiles WHERE id =1";
-$result = $conn->query($sql);
+$datetime = date("Y-m-d H:i:s");
+$firstname = $_POST["firstname"];
+$age = $_POST["age"];
 
+$sqlInsert = "INSERT INTO responses (fname, datetime, age) VALUES ('$firstname', '$datetime', '$age')";
+if ($conn->query($sqlInsert) === TRUE) {
+    echo "New session created successfully";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+$myStringID = strval($textID);
+$sql = "SELECT id, reutersID, text FROM textfiles WHERE id =$myStringID";
+$result = $conn->query($sql);
 if ($result->num_rows > 0) {
-    echo "<table><tr><th>Text</th></tr>";
+    echo "<table><tr><th>Reuters ID</th><th>Text</th></tr>";
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        echo "<tr><td>".$row["text"]."</td></tr>";
+        echo "<tr><td>".$row["reutersID"]."</td><td>".$row["text"]."</td></tr>";
     }
     echo "</table>";
 } else {
     echo "0 results";
 }
+
+$sqlInsert = "SELECT id FROM responses WHERE datetime=$datetime";
+$userID = $conn->query($getUserID);
+if ($result->num_rows > 0) {
+    echo "<table><tr><th>User ID</th><th>User Name</th></tr>";
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        echo "<tr><td>".$row["id"]."</td><td>".$row["fname"]."</td></tr>";
+    }
+    echo "</table>";
+} else {
+    echo "0 results";
+}
+
 $conn->close();
 ?>
 <h3><center>Classify this passage:</center></h3> 
 
         
-   <form action="page 2.php" method="post">       
+   <form action="confirmationpage.php" method="post">       
   <input type="radio" name="ans" id="Radio1" value="poem" onclick="enableSubmission()"> Poem<br>
   <input type="radio" name="ans" id="Radio2" value="speech" onclick="enableSubmission()"> Speech<br>
   <input type="radio" name="ans"id="Radio3" value="novel" onclick="enableSubmission()"> Novel<br>   
